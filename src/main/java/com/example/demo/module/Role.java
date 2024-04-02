@@ -1,6 +1,6 @@
 package com.example.demo.module;
 
-enum Role {
+public enum Role {
     ADMIN, USER
 
 }

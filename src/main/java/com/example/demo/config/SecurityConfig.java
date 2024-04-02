@@ -24,15 +24,15 @@ public class SecurityConfig {
         http
                 .csrf( csrf -> csrf.disable())
                 .authorizeRequests()
-                .requestMatchers("")
+                .requestMatchers("/api/v1/auth/**")
                 .permitAll()
-                .antMatchers("/api/v1/auth/**")
+                .anyRequest()
                 .authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .autheticationProvider( autheticationProvider)
+                .authenticationProvider( autheticationProvider)
                 .addFilterBefore(jwtAutheticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 
