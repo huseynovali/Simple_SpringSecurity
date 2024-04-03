@@ -6,6 +6,7 @@ import com.example.demo.dto.response.AuthenticationResponseDto;
 import com.example.demo.module.Role;
 import com.example.demo.module.User;
 import com.example.demo.repository.UserRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.Authenticator;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,20 +24,26 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationMeneger;
 
-    public AuthenticationResponseDto register(RegisterRequestDto request) {
-        var user = User.builder()
-                .name(request.getName())
+
+    public String register(RegisterRequestDto request) {
+        User user = userRepo.findByEmail(request.getEmail()).orElse(null);
+        if (user != null) {
+            throw new RuntimeException("User already exists");
+        }
+
+        user = User.builder()
                 .email(request.getEmail())
+                .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
         userRepo.save(user);
 
-        var jwtToken = jwtService.genereateToken(user);
-        return AuthenticationResponseDto.builder()
-                .token(jwtToken)
-                .build();
-
+//        var jwtToken = jwtService.genereateToken(user);
+//        return AuthenticationResponseDto.builder()
+//                .token(jwtToken)
+//                .build();
+    return  "User registered successfully";
 
     }
 
