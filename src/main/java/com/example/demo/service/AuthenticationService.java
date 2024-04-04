@@ -14,6 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -52,9 +55,13 @@ public class AuthenticationService {
          authenticationMeneger.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         var user = userRepo.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("authorities", user.getAuthorities().stream().map(Object::toString).toArray());
+        claims.put("userId", user.getId());
+        String token = jwtService.generateToken( claims,user);
 
         return AuthenticationResponseDto.builder()
-                .token(jwtService.genereateToken(user))
+                .token(token)
                 .build();
     }
 
